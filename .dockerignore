@@ -1,0 +1,31 @@
+# Node modules
+frontend/node_modules
+frontend/dist
+frontend/.vite
+
+# Rust build artifacts
+contracts/target
+**/*.wasm
+**/Cargo.lock
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local

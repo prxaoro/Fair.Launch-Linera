@@ -1,0 +1,30 @@
+# Linera Development Environment
+FROM rust:1.83-slim
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    pkg-config \
+    libssl-dev \
+    protobuf-compiler \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Linera CLI
+RUN cargo install linera-service@0.15.8
+
+# Add WASM target
+RUN rustup target add wasm32-unknown-unknown
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY . /app/
+
+# Expose ports
+EXPOSE 8080 9000
+
+# Default command (overridden in docker-compose)
+CMD ["bash"]

@@ -1,0 +1,49 @@
+[package]
+name = "fair-launch-swap"
+version = "0.1.0"
+edition = "2021"
+description = "Swap contract for Fair Launch platform - creates locked liquidity pools for graduated tokens"
+license = "MIT"
+
+[dependencies]
+fair-launch-abi = { path = "../abi" }
+
+# Linera
+linera-sdk = { workspace = true }
+linera-views = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Math
+primitive-types = { workspace = true }
+
+# Logging
+log = "0.4"
+
+# Service-only dependencies (not included in contract WASM)
+async-graphql = { workspace = true, optional = true }
+async-trait = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full", "test-util"] }
+linera-views = { workspace = true, features = ["test"] }
+
+[features]
+default = []
+service = ["async-graphql", "async-trait", "fair-launch-abi/service"]
+
+[[bin]]
+name = "fair_launch_swap_contract"
+path = "src/contract.rs"
+required-features = []
+
+[[bin]]
+name = "fair_launch_swap_service"
+path = "src/service.rs"
+required-features = ["service"]

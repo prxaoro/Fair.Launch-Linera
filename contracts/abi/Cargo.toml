@@ -1,0 +1,22 @@
+[package]
+name = "fair-launch-abi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+linera-sdk = { workspace = true }
+primitive-types = { workspace = true }
+getrandom = { workspace = true }
+
+# Service-only dependencies (not in contract WASM)
+async-graphql = { workspace = true, optional = true }
+
+[features]
+default = []
+service = ["async-graphql"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]

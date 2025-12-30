@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # All-in-one Linera development environment
+  linera-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.linera
+    container_name: fair-launch-linera
+    ports:
+      - "8080:8080"    # Linera GraphQL service
+      - "9000:9000"    # Linera validator
+    volumes:
+      - ./contracts:/app/contracts
+      - ./scripts:/app/scripts
+      - linera-data:/root/.config/linera
+      - cargo-cache:/usr/local/cargo/registry
+    environment:
+      - RUST_LOG=info
+    command: >
+      bash -c "
+      set -e
+      echo '=== Starting Linera Local Network ===' &&
+      cd /app/scripts &&
+      ./start-network.sh &&
+
+      echo '=== Building Contracts ===' &&
+      cd /app/contracts &&
+      cargo build --release --target wasm32-unknown-unknown &&
+
+      echo '=== Deploying Contracts ===' &&
+      cd /app/scripts &&
+      ./deploy-contracts.sh &&
+
+      echo '=== Starting Linera Service ===' &&
+      linera service --port 8080
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - fair-launch-net
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fair-launch-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      linera-dev:
+        condition: service_healthy
+    environment:
+      - VITE_GRAPHQL_ENDPOINT=http://linera-dev:8080
+    command: npm run dev -- --host
+    networks:
+      - fair-launch-net
+
+networks:
+  fair-launch-net:
+    driver: bridge
+
+volumes:
+  linera-data:
+  cargo-cache:
